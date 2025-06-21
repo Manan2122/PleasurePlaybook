@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pleasure Playbook</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #ffe1f0;
+  margin: 0;
+  padding: 0;
+}
+#game-board {
+  position: relative;
+  width: 600px;
+  height: 1068px;
+  margin: 20px auto;
+  background: url('Pleasureplaybook_Mobile_01.jpg') no-repeat center/contain;
+}
+#dice-box {
+  position: absolute;
+  top: 900px;
+  left: 250px;
+}
+#dice-image {
+  width: 100px;
+}
+.player {
+  position: absolute;
+  width: 40px;
+}
+#king {
+  top: 680px;
+  left: 520px;
+}
+#queen {
+  top: 680px;
+  left: 560px;
+}
+#card-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width:100vw;
+  height:100vh;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background: rgba(0,0,0,0.8);
+}
+#card-content {
+  background: #ffe1f0;
+  padding: 30px;
+  font-size: 18px;
+  border-radius: 10px;
+  max-width: 80%;
+  text-align: center;
+  color: #000;
+  box-shadow: 0px 0px 20px #ff69b4;
+}
+</style>
+</head>
+<body>
+<h2>🎲 Click the Dice to Roll</h2>
+<div id="game-board">
+  <div id="dice-box">
+    <img id="dice-image" src="01.png" alt="Dice">
+  </div>
+  <img id="king" class="player" src="King.png" alt="King">
+  <img id="queen" class="player" src="Queen.png" alt="Queen">
+</div>
+<div id="dice-result">Result will appear here</div>
+<div id="card-overlay">
+  <div id="card-content"></div>
+</div>
+<script>
+const positions = [
+  {top: 680, left: 520}, // START
+  {top: 615, left: 540},
+  {top: 585, left: 480},
+  {top: 530, left: 430},
+  {top: 555, left: 330},
+  {top: 555, left: 240},
+  {top: 620, left: 170},
+  {top: 590, left: 60},
+  {top: 530, left: 50},
+  {top: 470, left: 60},
+  {top: 500, left: 145},
+  {top: 460, left: 240},
+  {top: 415, left: 330},
+  {top: 450, left: 430},
+  {top: 400, left: 475},
+  {top: 335, left: 530},
+  {top: 315, left: 455},
+  {top: 300, left: 380},
+  {top: 330, left: 270},
+  {top: 400, left: 210},
+  {top: 370, left: 130},
+  {top: 370, left: 50},
+  {top: 300, left: 50},
+  {top: 240, left: 70},
+  {top: 265, left: 170},
+  {top: 200, left: 260}
+];
+const questionSteps = [1,3,5,7,9,11,13,15,17,19,21,23,25];
+let kingPosition = 0;
+let queenPosition = 0;
+let isKingTurn = true;
+
+const cards = [
+  "Kiss their any part slowly and suck hard enough to leave a mark.",
+  "Lick and tease their earlobe while pressing your body against theirs.",
+  "Kiss down their chest until your tongue is licking their dick/pussy.",
+  "Kiss them deep, grabbing their ass and grinding your hips against theirs.",
+  "Stare deep into their eyes, slide your hand down to their dick/pussy.",
+  "Use your hand to tease their nipples until they’re hard.",
+  "Give a slow thigh massage, brushing their dick/pussy every few strokes.",
+  "Tease their dick/pussy with your breath — no hands, no tongue, no mercy.",
+  "Give them a slow, grinding lap dance until they’re begging to fuck.",
+  "Kiss and lick a part of their body that you’ve never explored before.",
+  "Guide their hand to your pussy/dick and make them tease you until you moan.",
+  "Let them blindfold you and have their way with you for one turn.",
+  "Kneel between their legs and tease their inner thighs with slow, wet kisses.",
+  "Run your tongue along their neck until they're moaning for more.",
+  "Pin them down and grind your pussy/dick on theirs until you're both moaning.",
+  "Give your partner a slow and teasing back massage."
+];
+function movePlayer(player, position) {
+  player.style.top = positions[position].top + "px";
+  player.style.left = positions[position].left + "px";
+  if (questionSteps.includes(position)) {
+    showCard();
+  }
+}
+function showCard() {
+  if (cards.length === 0) {
+    alert("All cards have been used!"); // You can customize this
+    return;
+  }
+  const overlay = document.getElementById("card-overlay");
+  const content = document.getElementById("card-content");
+  const randomIndex = Math.floor(Math.random() * cards.length);
+  const randomCard = cards[randomIndex];
+  content.textContent = randomCard;
+
+  // ✅ Remove the used card from the array
+  cards.splice(randomIndex, 1);
+
+  overlay.style.display = "flex";
+}
+
+document.getElementById("card-overlay").addEventListener("click", () => {
+  document.getElementById("card-overlay").style.display = "none";
+});
+const diceBox = document.getElementById("dice-box");
+const diceImage = document.getElementById("dice-image");
+const resultDiv = document.getElementById("dice-result");
+const king = document.getElementById("king");
+const queen = document.getElementById("queen");
+
+diceBox.addEventListener("click", () => {
+  let counter = 0;
+  const interval = setInterval(() => {
+    counter++;
+    const face = (counter % 6) + 1;
+    const formatted = face < 10 ? `0${face}` : face;
+    diceImage.src = `${formatted}.png`;
+
+    if (counter > 15) {
+      clearInterval(interval);
+      const result = Math.floor(Math.random() * 6) + 1;
+
+      if (isKingTurn) {
+        kingPosition = Math.min(kingPosition + result, positions.length - 1);
+        movePlayer(king, kingPosition);
+      } else {
+        queenPosition = Math.min(queenPosition + result, positions.length - 1);
+        movePlayer(queen, queenPosition);
+      }
+
+      resultDiv.textContent = `${isKingTurn ? "King" : "Queen"} rolled a ${result}!`;
+      isKingTurn = !isKingTurn;
+    }
+  }, 100);
+});
+</script>
+</body>
+</html>
